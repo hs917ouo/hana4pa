@@ -24,10 +24,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
+    <html lang='ko'>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <nav className='flex w-full items-center justify-between bg-green-500 p-2'>
+          <a href='/' className='text-3xl font-extrabold text-white'>
+            나만의 레시피
+          </a>
+          <div className='m-1 flex gap-2'>
+            <button className='m-1 rounded-lg border border-blue-500 bg-blue-500 p-1 font-semibold text-white'>
+              레시피 추가
+            </button>
+            <button className='m-1 rounded-lg border border-red-500 bg-red-500 p-1 font-semibold text-white'>
+              로그아웃
+            </button>
+          </div>
+        </nav>
         {children}
       </body>
     </html>
