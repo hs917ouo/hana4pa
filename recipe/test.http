@@ -1,0 +1,34 @@
+@host=http://localhost:3000
+
+# {
+#     id:1,
+#     session: 'SampleSession',
+#     title:'SampleTitle',
+#     tag:[{id:1, value:'SampleTag1'},
+#         {id:2, value:'SampleTag2'}],
+#     ingredient:[{id:1, value:'Sampleingredient1'},
+#                 {id:2, value:'Sampleingredient2'}],
+#     process:[{id:1, value:'Sampleprocess1'},
+#              {id:2, value:'Sampleprocess2'}],
+# }
+
+# get session
+GET {{{host}}}/api/sss
+
+# get recipes
+GET {{host}}/api/recipes
+
+# get a recipe
+GET {{host}}/api/recipes/1
+
+# add a recipe
+POST {{host}}/api/recipes/1
+
+# update a recipe
+PATCH {{host}}/api/recipes/1
+
+# remove a recipe
+DELETE {{host}}/api/recipes/1
+
+
+
