@@ -161,7 +161,7 @@ export default function ModifyRecipe() {
     <>
       {session ? (
         <div>
-          {(session.user?.email as string) === user &&
+          {email === user &&
           recipes?.find((recipe) => recipe.name === name) &&
           recipes?.find((recipe) => recipe.version === prevVersion) ? (
             <form onSubmit={handleSubmit} className='ml-2 mt-16'>

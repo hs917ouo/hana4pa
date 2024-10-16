@@ -102,7 +102,7 @@ export default function AddRecipe() {
     <>
       {session ? (
         <div>
-          {(session.user?.email as string) === user ? (
+          {email === user ? (
             <form onSubmit={handleSubmit} className='ml-2 mt-16'>
               <p className='mb-2 text-2xl font-bold'>새 레시피 추가</p>
               <div>

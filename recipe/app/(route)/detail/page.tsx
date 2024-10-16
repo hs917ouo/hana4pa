@@ -85,7 +85,7 @@ export default function Detail() {
     <>
       {session ? (
         <>
-          {recipe && (session.user?.email as string) === user ? (
+          {recipe && email === user ? (
             <div className='ml-2'>
               <p className='mt-16 text-3xl font-bold'>{recipe.name}</p>
               <p className='my-2 font-bold'>조리 과정</p>
