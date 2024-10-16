@@ -1,19 +1,13 @@
 'use client';
 
+import { type Recipe } from '@/app';
 import NotLogined from '@/components/NotLogined';
+import Timer from '@/components/Timer';
 import Warning from '@/components/Warning';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
-type Recipe = {
-  name: string;
-  tags: string[];
-  ingredients: string[];
-  steps: string[];
-  version: number;
-};
 
 export default function Detail() {
   const user = JSON.parse(localStorage.getItem('user') || '') as string;
@@ -27,7 +21,6 @@ export default function Detail() {
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [recipeVersions, setRecipeVersions] = useState<Recipe[]>([]);
-
   const handleDelete = () => {
     if (email && name) {
       const updated = recipes.filter((recipe) => recipe.name !== name);
@@ -40,6 +33,7 @@ export default function Detail() {
     e: React.MouseEvent<HTMLButtonElement>,
     version: number
   ) => {
+    e.preventDefault();
     const update = recipeVersions.find(
       (recipe) => recipe.version === version
     ) as Recipe;
@@ -47,8 +41,14 @@ export default function Detail() {
       (prev: Recipe, curr: Recipe) =>
         curr.version > prev.version ? curr : prev
     );
+    ///// 최신 버전은 업데이트 하지 않음 /////
+    if (update.version === findNewVersion.version) return;
     update.version = findNewVersion.version + 1;
-    localStorage.setItem(`${email}`, JSON.stringify(recipes));
+    localStorage.setItem(
+      `${email}`,
+      JSON.stringify(recipes.sort((a, b) => a.version - b.version))
+    );
+
     router.push(
       `/detail?email=${email}&name=${name}&version=${update.version}`
     );
@@ -73,6 +73,7 @@ export default function Detail() {
     } else {
       setRecipe(null);
     }
+
     const recipeVersionList =
       recipes && name ? recipes.filter((recipe) => recipe.name === name) : null;
     if (recipeVersionList) {
@@ -94,15 +95,8 @@ export default function Detail() {
                     <p className='my-2 font-bold'>
                       Step {index + 1}: {step}
                     </p>
-                    <div className='flex gap-2'>
-                      <input
-                        type='number'
-                        placeholder='시간 (초)'
-                        className='rounded-sm border border-gray-300 p-2'
-                      />
-                      <button className='rounded-sm bg-blue-500 p-2 text-white'>
-                        타이머 시작
-                      </button>
+                    <div>
+                      <Timer />
                     </div>
                   </div>
                 ))}
@@ -142,7 +136,14 @@ export default function Detail() {
 
               <div className='my-6 flex gap-2'>
                 <Link
-                  href='/modifyRecipe'
+                  href={{
+                    pathname: '/modifyRecipe',
+                    query: {
+                      email: session?.user?.email,
+                      name: recipe.name,
+                      version: recipe.version,
+                    },
+                  }}
                   className='rounded-sm bg-yellow-500 p-2 text-white'
                 >
                   수정

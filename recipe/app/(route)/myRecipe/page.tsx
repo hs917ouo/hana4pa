@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-type Recipe = {
+type RecipeSummary = {
   name: string;
   tags: string[];
   version: number;
@@ -15,7 +15,7 @@ type Recipe = {
 export default function MyRecipe() {
   const user = JSON.parse(localStorage.getItem('user') || '') as string;
   const { data: session } = useSession();
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [recipes, setRecipes] = useState<RecipeSummary[]>([]);
 
   useEffect(() => {
     if (session && session.user && session.user.email) {
@@ -24,12 +24,10 @@ export default function MyRecipe() {
       if (storedData) {
         const parsedRecipes = JSON.parse(storedData);
 
-        // 같은 이름의 레시피 중 최신 버전만 남기기
         const latestRecipes = parsedRecipes.reduce(
-          (acc: Recipe[], current: Recipe) => {
+          (acc: RecipeSummary[], current: RecipeSummary) => {
             const existing = acc.find((r) => r.name === current.name);
             if (!existing || existing.version < current.version) {
-              // 최신 버전이 있으면 교체
               return acc.filter((r) => r.name !== current.name).concat(current);
             }
             return acc;

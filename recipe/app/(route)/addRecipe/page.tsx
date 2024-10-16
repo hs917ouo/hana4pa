@@ -1,21 +1,16 @@
 'use client';
 
+import { type Recipe } from '@/app';
 import NotLogined from '@/components/NotLogined';
 import Warning from '@/components/Warning';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
-type Recipe = {
-  name: string;
-  tags: string[];
-  ingredients: string[];
-  steps: string[];
-  version: number;
-};
 
 export default function AddRecipe() {
   const user = JSON.parse(localStorage.getItem('user') || '') as string;
   const { data: session } = useSession();
+  const router = useRouter();
   const [email, setEmail] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [tags, setTags] = useState<string[]>([]);
@@ -97,6 +92,10 @@ export default function AddRecipe() {
     setTags([]);
     setIngredients([]);
     setSteps([]);
+
+    router.push(
+      `/detail?email=${email}&name=${newRecipe.name}&version=${newRecipe.version}`
+    );
   };
 
   return (
