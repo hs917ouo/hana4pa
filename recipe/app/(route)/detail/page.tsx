@@ -1,5 +1,7 @@
 'use client';
 
+import NotLogined from '@/components/NotLogined';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -13,6 +15,7 @@ type Recipe = {
 };
 
 export default function Detail() {
+  const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
@@ -73,92 +76,103 @@ export default function Detail() {
     if (recipeVersionList) {
       setRecipeVersions(recipeVersionList);
     }
-  }, [email, name, version]);
+  }, [email, name, version, session]);
 
   return (
     <>
-      {recipe ? (
-        <div className='ml-2'>
-          <p className='mt-16 text-3xl font-bold'>{recipe.name}</p>
-          <p className='my-2 font-bold'>조리 과정</p>
-          <div>
-            {recipe.steps.map((step, index) => (
-              <div className='my-1' key={index}>
-                <p className='my-2 font-bold'>
-                  Step {index + 1}: {step}
-                </p>
-                <div className='flex gap-2'>
-                  <input
-                    type='number'
-                    placeholder='시간 (초)'
-                    className='rounded-sm border border-gray-300 p-2'
-                  />
-                  <button className='rounded-sm bg-blue-500 p-2 text-white'>
-                    타이머 시작
+      {session ? (
+        <>
+          {recipe ? (
+            <div className='ml-2'>
+              <p className='mt-16 text-3xl font-bold'>{recipe.name}</p>
+              <p className='my-2 font-bold'>조리 과정</p>
+              <div>
+                {recipe.steps.map((step, index) => (
+                  <div className='my-1' key={index}>
+                    <p className='my-2 font-bold'>
+                      Step {index + 1}: {step}
+                    </p>
+                    <div className='flex gap-2'>
+                      <input
+                        type='number'
+                        placeholder='시간 (초)'
+                        className='rounded-sm border border-gray-300 p-2'
+                      />
+                      <button className='rounded-sm bg-blue-500 p-2 text-white'>
+                        타이머 시작
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className='my-2 flex flex-wrap space-x-2'>
+                {recipe.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className='rounded-sm bg-gray-200 p-2 text-gray-600'
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+              <p className='my-2 font-bold'>재료</p>
+              <ul className='ml-6 list-disc'>
+                {recipe.ingredients.map((ingredient, index) => (
+                  <li key={index}>{ingredient}</li>
+                ))}
+              </ul>
+              <p className='my-2 font-bold'>조리 과정</p>
+              <ol className='ml-6 list-decimal'>
+                {recipe.steps.map((step, index) => (
+                  <li key={index}>{step}</li>
+                ))}
+              </ol>
+              <p className='my-2 font-bold'>수정 기록</p>
+
+              {recipeVersions.map((item) => (
+                <div
+                  className='my-2 flex items-center gap-2'
+                  key={item.version}
+                >
+                  <p className='font-bold'>버전 {item.version}</p>
+                  <button
+                    onClick={(e) => handleRecovery(e, item.version)}
+                    className='rounded-sm bg-blue-500 p-2 text-white'
+                  >
+                    이 버전으로 복원
                   </button>
                 </div>
+              ))}
+
+              <div className='my-6 flex gap-2'>
+                <Link
+                  href='/modifyRecipe'
+                  className='rounded-sm bg-yellow-500 p-2 text-white'
+                >
+                  수정
+                </Link>
+                <button
+                  onClick={handleDelete}
+                  className='rounded-sm bg-red-500 p-2 text-white'
+                >
+                  삭제
+                </button>
+                <Link
+                  href='/myRecipe'
+                  className='rounded-sm bg-gray-500 p-2 text-white'
+                >
+                  목록으로
+                </Link>
               </div>
-            ))}
-          </div>
-          <div className='my-2 flex flex-wrap space-x-2'>
-            {recipe.tags.map((tag, index) => (
-              <span
-                key={index}
-                className='rounded-sm bg-gray-200 p-2 text-gray-600'
-              >
-                #{tag}
-              </span>
-            ))}
-          </div>
-          <p className='my-2 font-bold'>재료</p>
-          <ul className='ml-6 list-disc'>
-            {recipe.ingredients.map((ingredient, index) => (
-              <li key={index}>{ingredient}</li>
-            ))}
-          </ul>
-          <p className='my-2 font-bold'>조리 과정</p>
-          <ol className='ml-6 list-decimal'>
-            {recipe.steps.map((step, index) => (
-              <li key={index}>{step}</li>
-            ))}
-          </ol>
-          <p className='my-2 font-bold'>수정 기록</p>
-
-          {recipeVersions.map((item) => (
-            <div className='my-2 flex items-center gap-2' key={item.version}>
-              <p className='font-bold'>버전 {item.version}</p>
-              <button
-                onClick={(e) => handleRecovery(e, item.version)}
-                className='rounded-sm bg-blue-500 p-2 text-white'
-              >
-                이 버전으로 복원
-              </button>
             </div>
-          ))}
-
-          <div className='my-6 flex gap-2'>
-            <Link
-              href='/modifyRecipe'
-              className='rounded-sm bg-yellow-500 p-2 text-white'
-            >
-              수정
-            </Link>
-            <button
-              onClick={handleDelete}
-              className='rounded-sm bg-red-500 p-2 text-white'
-            >
-              삭제
-            </button>
-            <Link
-              href='/myRecipe'
-              className='rounded-sm bg-gray-500 p-2 text-white'
-            >
-              목록으로
-            </Link>
-          </div>
-        </div>
+          ) : (
+            <>잘못된 접근입니다.</>
+          )}
+        </>
       ) : (
-        <>잘못된 접근입니다.</>
+        <div className='text-center'>
+          <NotLogined />
+        </div>
       )}
     </>
   );
