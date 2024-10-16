@@ -1,6 +1,7 @@
 'use client';
 
 import NotLogined from '@/components/NotLogined';
+import Warning from '@/components/Warning';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
@@ -13,6 +14,7 @@ type Recipe = {
 };
 
 export default function AddRecipe() {
+  const user = JSON.parse(localStorage.getItem('user') || '') as string;
   const { data: session } = useSession();
   const [email, setEmail] = useState<string | null>(null);
   const [name, setName] = useState('');
@@ -100,104 +102,112 @@ export default function AddRecipe() {
   return (
     <>
       {session ? (
-        <form onSubmit={handleSubmit} className='ml-2 mt-16'>
-          <p className='mb-2 text-2xl font-bold'>새 레시피 추가</p>
-          <div>
-            <label className='mb-2 text-lg'>레시피 제목</label>
-            <p></p>
-            <input
-              type='text'
-              value={name}
-              placeholder='레시피 제목을 입력하세요.'
-              onChange={(e) => setName(e.target.value)}
-              required
-              className='w-2/3 rounded-md border border-gray-300 p-2'
-            />
-          </div>
-          <div>
-            <label className='mb-2 text-lg'>태그</label>
-            <p></p>
-            <input
-              type='text'
-              value={newTag}
-              placeholder='태그를 입력하세요.'
-              onKeyDown={(e) => handleKeyDown(e, addTag)}
-              onChange={(e) => setNewTag(e.target.value)}
-              className='w-2/3 rounded-md border border-gray-300 p-2'
-            />
-            <button
-              type='button'
-              onClick={addTag}
-              className='m-1 rounded-md bg-purple-300 p-2 text-white'
-            >
-              추가
-            </button>
-            <div className='flex flex-wrap space-x-2'>
-              {tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className='rounded border border-gray-400 bg-gray-200 p-2 text-gray-600'
+        <div>
+          {(session.user?.email as string) === user ? (
+            <form onSubmit={handleSubmit} className='ml-2 mt-16'>
+              <p className='mb-2 text-2xl font-bold'>새 레시피 추가</p>
+              <div>
+                <label className='mb-2 text-lg'>레시피 제목</label>
+                <p></p>
+                <input
+                  type='text'
+                  value={name}
+                  placeholder='레시피 제목을 입력하세요.'
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  className='w-2/3 rounded-md border border-gray-300 p-2'
+                />
+              </div>
+              <div>
+                <label className='mb-2 text-lg'>태그</label>
+                <p></p>
+                <input
+                  type='text'
+                  value={newTag}
+                  placeholder='태그를 입력하세요.'
+                  onKeyDown={(e) => handleKeyDown(e, addTag)}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  className='w-2/3 rounded-md border border-gray-300 p-2'
+                />
+                <button
+                  type='button'
+                  onClick={addTag}
+                  className='m-1 rounded-md bg-purple-300 p-2 text-white'
                 >
-                  #{tag}
-                </span>
-              ))}
+                  추가
+                </button>
+                <div className='flex flex-wrap space-x-2'>
+                  {tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className='rounded border border-gray-400 bg-gray-200 p-2 text-gray-600'
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className='mb-2 text-lg'>재료 목록</label>
+                <p></p>
+                <input
+                  type='text'
+                  value={newIngredient}
+                  placeholder='재료를 입력하세요.'
+                  onKeyDown={(e) => handleKeyDown(e, addIngredient)}
+                  onChange={(e) => setNewIngredient(e.target.value)}
+                  className='w-2/3 rounded-md border border-gray-300 p-2'
+                />
+                <button
+                  type='button'
+                  onClick={addIngredient}
+                  className='m-1 rounded-md bg-green-300 p-2 text-white'
+                >
+                  추가
+                </button>
+                <ul className='ml-6 list-disc'>
+                  {ingredients.map((ingredient, index) => (
+                    <li key={index}>{ingredient}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <label className='mb-2 text-lg'>조리 과정</label>
+                <p></p>
+                <input
+                  type='text'
+                  value={newStep}
+                  placeholder='조리 과정을 입력하세요.'
+                  onKeyDown={(e) => handleKeyDown(e, addStep)}
+                  onChange={(e) => setNewStep(e.target.value)}
+                  className='w-2/3 rounded-md border border-gray-300 p-2'
+                />
+                <button
+                  type='button'
+                  onClick={addStep}
+                  className='m-1 rounded-md bg-green-300 p-2 text-white'
+                >
+                  추가
+                </button>
+                <ol className='ml-6 list-decimal'>
+                  {steps.map((step, index) => (
+                    <li key={index}>{step}</li>
+                  ))}
+                </ol>
+              </div>
+              <button
+                type='submit'
+                className='m-1 rounded-md bg-blue-300 p-2 text-white'
+              >
+                레시피 저장
+              </button>
+            </form>
+          ) : (
+            <div className='text-center'>
+              <Warning />
             </div>
-          </div>
-          <div>
-            <label className='mb-2 text-lg'>재료 목록</label>
-            <p></p>
-            <input
-              type='text'
-              value={newIngredient}
-              placeholder='재료를 입력하세요.'
-              onKeyDown={(e) => handleKeyDown(e, addIngredient)}
-              onChange={(e) => setNewIngredient(e.target.value)}
-              className='w-2/3 rounded-md border border-gray-300 p-2'
-            />
-            <button
-              type='button'
-              onClick={addIngredient}
-              className='m-1 rounded-md bg-green-300 p-2 text-white'
-            >
-              추가
-            </button>
-            <ul className='ml-6 list-disc'>
-              {ingredients.map((ingredient, index) => (
-                <li key={index}>{ingredient}</li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <label className='mb-2 text-lg'>조리 과정</label>
-            <p></p>
-            <input
-              type='text'
-              value={newStep}
-              placeholder='조리 과정을 입력하세요.'
-              onKeyDown={(e) => handleKeyDown(e, addStep)}
-              onChange={(e) => setNewStep(e.target.value)}
-              className='w-2/3 rounded-md border border-gray-300 p-2'
-            />
-            <button
-              type='button'
-              onClick={addStep}
-              className='m-1 rounded-md bg-green-300 p-2 text-white'
-            >
-              추가
-            </button>
-            <ol className='ml-6 list-decimal'>
-              {steps.map((step, index) => (
-                <li key={index}>{step}</li>
-              ))}
-            </ol>
-          </div>
-          <button
-            type='submit'
-            className='m-1 rounded-md bg-blue-300 p-2 text-white'
-          >
-            레시피 저장
-          </button>
-        </form>
+          )}
+        </div>
       ) : (
         <div className='text-center'>
           <NotLogined />

@@ -1,6 +1,7 @@
 'use client';
 
 import NotLogined from '@/components/NotLogined';
+import Warning from '@/components/Warning';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -12,6 +13,7 @@ type Recipe = {
 };
 
 export default function MyRecipe() {
+  const user = JSON.parse(localStorage.getItem('user') || '') as string;
   const { data: session } = useSession();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
 
@@ -43,41 +45,49 @@ export default function MyRecipe() {
     <>
       {session ? (
         <div>
-          <p className='mt-16'></p>
-          {recipes.length > 0 ? (
-            recipes.map((recipe) => (
-              <div
-                key={recipe.name}
-                className='m-4 rounded border border-gray-300 p-4'
-              >
-                <h3 className='text-lg font-bold'>{recipe.name}</h3>
-                <div className='flex space-x-2'>
-                  {recipe.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className='rounded bg-gray-200 p-1 text-gray-600'
+          {(session.user?.email as string) === user ? (
+            <div>
+              <p className='mt-16'></p>
+              {recipes.length > 0 ? (
+                recipes.map((recipe) => (
+                  <div
+                    key={recipe.name}
+                    className='m-4 rounded border border-gray-300 p-4'
+                  >
+                    <h3 className='text-lg font-bold'>{recipe.name}</h3>
+                    <div className='flex space-x-2'>
+                      {recipe.tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className='rounded bg-gray-200 p-1 text-gray-600'
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                    <Link
+                      href={{
+                        pathname: '/detail',
+                        query: {
+                          email: session?.user?.email,
+                          name: recipe.name,
+                          version: recipe.version,
+                        },
+                      }}
+                      className='mt-2 inline-block w-full rounded-md bg-green-500 p-1 text-center text-white'
                     >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-                <Link
-                  href={{
-                    pathname: '/detail',
-                    query: {
-                      email: session?.user?.email,
-                      name: recipe.name,
-                      version: recipe.version,
-                    },
-                  }}
-                  className='mt-2 inline-block w-full rounded-md bg-green-500 p-1 text-center text-white'
-                >
-                  자세히 보기
-                </Link>
-              </div>
-            ))
+                      자세히 보기
+                    </Link>
+                  </div>
+                ))
+              ) : (
+                <>No Recipe</>
+              )}
+            </div>
           ) : (
-            <>No Recipe</>
+            <div className='text-center'>
+              <Warning />
+            </div>
           )}
         </div>
       ) : (

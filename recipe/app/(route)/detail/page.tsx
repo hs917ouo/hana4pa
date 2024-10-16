@@ -1,6 +1,7 @@
 'use client';
 
 import NotLogined from '@/components/NotLogined';
+import Warning from '@/components/Warning';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -15,6 +16,7 @@ type Recipe = {
 };
 
 export default function Detail() {
+  const user = JSON.parse(localStorage.getItem('user') || '') as string;
   const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -82,7 +84,7 @@ export default function Detail() {
     <>
       {session ? (
         <>
-          {recipe ? (
+          {recipe && (session.user?.email as string) === user ? (
             <div className='ml-2'>
               <p className='mt-16 text-3xl font-bold'>{recipe.name}</p>
               <p className='my-2 font-bold'>조리 과정</p>
@@ -121,12 +123,6 @@ export default function Detail() {
                   <li key={index}>{ingredient}</li>
                 ))}
               </ul>
-              <p className='my-2 font-bold'>조리 과정</p>
-              <ol className='ml-6 list-decimal'>
-                {recipe.steps.map((step, index) => (
-                  <li key={index}>{step}</li>
-                ))}
-              </ol>
               <p className='my-2 font-bold'>수정 기록</p>
 
               {recipeVersions.map((item) => (
@@ -166,7 +162,9 @@ export default function Detail() {
               </div>
             </div>
           ) : (
-            <>잘못된 접근입니다.</>
+            <div className='text-center'>
+              <Warning />
+            </div>
           )}
         </>
       ) : (
