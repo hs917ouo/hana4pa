@@ -55,27 +55,24 @@ export default function AddRecipe() {
     addFunction: () => void
   ) => {
     if (e.key === 'Enter') {
-      e.preventDefault(); // 기본 Enter 동작 막기
-      addFunction(); // 해당 항목 추가 함수 실행
+      e.preventDefault();
+      addFunction();
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return; // 이메일 없으면 종료
+    if (!email) return;
 
-    // 기존 레시피 데이터 불러오기
     const storedData = localStorage.getItem(email);
-    const recipes = storedData ? JSON.parse(storedData) : [];
+    const recipes = storedData ? (JSON.parse(storedData) as Recipe[]) : [];
 
-    // 같은 이름의 레시피 중 가장 최신 버전을 찾음
     const sameNameRecipes = recipes.filter(
       (recipe: Recipe) => recipe.name === name
     );
     let newVersion = 1;
 
     if (sameNameRecipes.length > 0) {
-      // 같은 이름의 레시피 중 가장 높은 버전을 찾아 다음 버전을 설정
       const latestRecipe = sameNameRecipes.reduce(
         (prev: Recipe, curr: Recipe) =>
           curr.version > prev.version ? curr : prev
@@ -83,7 +80,6 @@ export default function AddRecipe() {
       newVersion = latestRecipe.version + 1;
     }
 
-    // 새로운 버전의 레시피 추가
     const newRecipe = {
       name,
       version: newVersion,
@@ -93,10 +89,8 @@ export default function AddRecipe() {
     };
     recipes.push(newRecipe);
 
-    // 업데이트된 레시피 리스트를 로컬스토리지에 저장
     localStorage.setItem(email, JSON.stringify(recipes));
 
-    // 폼 초기화
     setName('');
     setTags([]);
     setIngredients([]);
